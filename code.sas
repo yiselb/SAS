@@ -1,0 +1,48 @@
+/*2 - a & 2 - b*/
+FILENAME boston '/home/u49700496/housing.data';
+DATA housing_dataset Train Test;
+	INFILE boston;
+	INPUT CRIM ZN INDUS CHAS NOX RM AGE DIS RAD TAX PTRATIO B LSTAT MEDV;
+	n=_n_;
+	IF MEDV=50 OR RM=8.780 THEN delete;
+	IF n <=354 THEN output Train;
+	ELSE IF n>354 THEN output test;
+RUN;
+DATA housing_dataset1;
+	INFILE boston;
+	INPUT INPUT CRIM ZN INDUS CHAS NOX RM AGE DIS RAD TAX PTRATIO B LSTAT MEDV;
+	IF MEDV=50 OR RM=8.780 THEN delete;
+RUN;
+PROC print data=housing_dataset1;
+RUN;
+PROC print data=housing_dataset;
+RUN;
+PROC print DATA=Train;
+Title "Train";
+RUN;
+PROC print DATA=Test;
+Title "Test";
+RUN;
+/*3 - a*/
+PROC ANOVA data=housing_dataset1;
+Class CHAS RAD;
+MODEL MEDV = CHAS RAD CHAS*RAD; 
+RUN;
+/*3 - b*/
+PROC GLM data=housing_dataset1 plots=diagnostics;
+Class CHAS RAD;
+MODEL MEDV = CHAS RAD CHAS*RAD; 
+RUN;
+/*4 - b*/
+PROC REG DATA=Train;
+MODEL MEDV=CRIM ZN INDUS CHAS NOX RM AGE DIS RAD TAX PTRATIO B LSTAT;
+RUN;
+/*4 - c*/
+PROC REG DATA=Train;
+MODEL MEDV=CRIM ZN INDUS CHAS NOX RM AGE DIS RAD TAX PTRATIO B LSTAT;
+MODEL MEDV=CRIM ZN INDUS CHAS NOX RM AGE DIS RAD TAX PTRATIO B LSTAT/ selection=forward;
+MODEL MEDV=CRIM ZN INDUS CHAS NOX RM AGE DIS RAD TAX PTRATIO B LSTAT/ selection=backward;
+MODEL MEDV=CRIM ZN INDUS CHAS NOX RM AGE DIS RAD TAX PTRATIO B LSTAT/ selection=stepwise;
+MODEL MEDV=CRIM ZN INDUS CHAS NOX RM AGE DIS RAD TAX PTRATIO B LSTAT/ selection=rsqaure;
+RUN;
+
